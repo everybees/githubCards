@@ -65,11 +65,6 @@
 
   export default {
     name: 'HelloWorld',
-    // props: {
-    //   description: String,
-    //   name: String,
-    //   source: String,
-    // },
     methods: {
       increaseLikes(item, like) {
         item.number_of_likes = like + 1

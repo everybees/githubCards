@@ -3,6 +3,7 @@
         class="mx-auto my-12"
         min-width="350"
         max-width="600"
+        v-if="show"
     >
 
       <v-img
@@ -10,7 +11,7 @@
           :src="user.avatar_url"
       ></v-img>
 
-      <a :href="`https://www.github.com/${username}`"
+      <a :href="user.html_url"
          target="_blank">
         <v-card-title>{{ user.name }}</v-card-title>
       </a>
@@ -25,7 +26,7 @@
           </div>
         </v-row>
 
-        <a :href="`https://www.github.com/${username}?tab=followers`" target="_blank">
+        <a :href="user.followers_url" target="_blank">
           <div class="my-4 text-subtitle-1">
           Followers: {{ user.followers}}
           </div>
@@ -34,31 +35,31 @@
         <div>{{ user.bio }}</div>
       </v-card-text>
 
+      <v-card-actions>
+        <div class="close">
+          <v-btn color="red" dark @click="removeUser(0.5)">Remove</v-btn>
+        </div>
+      </v-card-actions>
+
     </v-card>
   </template>
 
 <script>
 
-import {getUserData} from '../apiCalls/apisercvices'
-
 export default {
   name: "UserProfileCard",
   props: {
-    username: String
+    user: Object
   },
   data() {
-    return {
-      user: {}
-    }
+   return {
+     show: true,
+   }
   },
-  mounted() {
-   getUserData(this.username).then(res=>{
-     console.log(res)
-     this.user = res.data
-   })
-    .catch(error=>{
-      console.log(error)
-    })
+  methods: {
+    removeUser(seconds) {
+      setTimeout(() => this.show = false, seconds * 1000)
+    }
   }
 }
 </script>

@@ -4,6 +4,9 @@
      <v-main>
        <header>
          <h1>GitHub Profiles</h1>
+         <p style="color: green" v-if="hours < 12">Good Morning</p>
+         <p style="color: yellow" v-if="hours >= 12 && hours < 18">Good Afternoon</p>
+         <p style="color: darkslategray" v-if="hours >= 18">Good Evening</p>
        </header>
        <v-row>
          <v-col>
@@ -14,22 +17,27 @@
                  outlined
              >
              </v-text-field>
-             <p>{{ username }}</p>
+
              <v-btn @click="removeUsername(username)" class="mr-4">Remove Username</v-btn>
              <v-btn @click="addUsername(username)" class="mr-4">Add Username</v-btn>
            </div>
          </v-col>
        </v-row>
        <UserProfileCard
-           v-for="(username, i) in reversedListOfUsernames" :key="i" :username="username"/>
+           v-for="(user, i) in reversedListOfUsernames" :key="i"
+           :user="user"/>
      </v-main>
    </v-container>
+    <h3
+        v-if="userData.length === 0"
+        style="text-align: center"
+    >Enter a github username</h3>
   </v-app>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld';
 import UserProfileCard from "./components/UserProfileCard";
+import axios from "axios";
 
 export default {
   name: 'App',
@@ -38,26 +46,28 @@ export default {
   },
   data() {
     return {
-      usernames: ['everybees', 'kolokodess', 'iamr0b0tx'],
-      username: ""
+      username: "",
+      userData: [],
+      hours: new Date().getHours()
     }
   },
   computed: {
     reversedListOfUsernames() {
-      return this.usernames.slice(0).reverse();
+      return this.userData.slice(0).reverse()
     }
   },
   methods: {
     addUsername(username) {
-      this.usernames.push(username)
+      this.getUser(username)
       this.username = ''
     },
     removeUsername(username) {
-      const index = this.usernames.indexOf(username)
-      console.log(index, this.usernames)
-      if (index > -1) {
-        this.usernames.splice(index, 1)
-      }
+      return username
+    },
+    getUser(username) {
+      axios
+      .get(`https://api.github.com/users/${username}`)
+      .then(response => (this.userData.push(response.data)))
     }
   },
 };
