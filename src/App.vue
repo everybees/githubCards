@@ -1,12 +1,29 @@
 <template>
-  <v-app>
+  <v-app :style="{backgroundColor: applyColor}">
    <v-container>
      <v-main>
        <header>
          <h1>GitHub Profiles</h1>
-         <p style="color: green" v-if="hours < 12">Good Morning</p>
-         <p style="color: yellow" v-if="hours >= 12 && hours < 18">Good Afternoon</p>
-         <p style="color: darkslategray" v-if="hours >= 18">Good Evening</p>
+        <v-row>
+          <v-col>
+            <transition name="fade">
+              <div v-if="divVisible"
+              >
+                <span style="color: green" v-if="hours < 12">Good Morning</span>
+                <span style="color: yellow" v-if="hours >= 12 && hours < 18">Good Afternoon</span>
+                <span style="color: darkslategray" v-if="hours >= 18">Good Evening</span>
+                <span>, User</span>
+              </div>
+            </transition>
+          </v-col>
+          <v-col class="mr-10">
+            <v-btn
+                @click="divVisible = !divVisible">
+              <span v-if="divVisible" style="color: red">X</span>
+              <span v-else>=></span>
+              </v-btn>
+          </v-col>
+        </v-row>
        </header>
        <v-row>
          <v-col>
@@ -18,8 +35,7 @@
              >
              </v-text-field>
 
-             <v-btn @click="removeUsername(username)" class="mr-4">Remove Username</v-btn>
-             <v-btn @click="addUsername(username)" class="mr-4">Add Username</v-btn>
+             <v-btn @click="addUsername(username)" style="font-size: 12px" class="mr-4">Add Username</v-btn>
            </div>
          </v-col>
        </v-row>
@@ -28,10 +44,10 @@
            :user="user"/>
      </v-main>
    </v-container>
-    <h3
+    <h2
         v-if="userData.length === 0"
         style="text-align: center"
-    >Enter a github username</h3>
+    >Github Users will appear here</h2>
   </v-app>
 </template>
 
@@ -48,12 +64,24 @@ export default {
     return {
       username: "",
       userData: [],
-      hours: new Date().getHours()
+      hours: new Date().getHours(),
+      seconds: 0,
+      divVisible: true,
+      color: "#e2e300"
     }
   },
   computed: {
     reversedListOfUsernames() {
       return this.userData.slice(0).reverse()
+    },
+    applyColor() {
+      if (this.hours < 12) {
+        return this.color
+      } else if (this.hours >= 12 && this.hours < 18) {
+        return "#5189f7"
+      } else {
+        return "#1f0f7e"
+      }
     }
   },
   methods: {
@@ -61,14 +89,24 @@ export default {
       this.getUser(username)
       this.username = ''
     },
-    removeUsername(username) {
-      return username
-    },
     getUser(username) {
       axios
       .get(`https://api.github.com/users/${username}`)
       .then(response => (this.userData.push(response.data)))
-    }
+    },
   },
+ created() {
+    setInterval(() => {
+      this.seconds++
+    }, 1000)
+ },
 };
 </script>
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+</style>
